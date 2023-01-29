@@ -1,0 +1,20 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model RatingToQuestionVM
+
+@if (User.Identity.IsAuthenticated && Model.Rating == 1)
+{
+    <a style="margin-right: 5px;" asp-controller="@Model.Controller" asp-action="Add" asp-route-id="@Model.Id" class="text-success"><i class="bi bi-arrow-up-square-fill"></i></a>
+}
+else
+{
+    <a style="margin-right: 5px;" asp-controller="@Model.Controller" asp-action="Add" asp-route-id="@Model.Id" class="text-success"><i class="bi bi-arrow-up-square"></i></a>
+}
+@(Model.TotalRating > 0 ? "+" + Model.TotalRating : Model.TotalRating)
+@if (User.Identity.IsAuthenticated && Model.Rating == -1)
+{
+    <a style="margin-left: 5px;" asp-controller="@Model.Controller" asp-action="Remove" asp-route-id="@Model.Id" class="text-danger"><i class="bi bi-arrow-down-square-fill"></i></a>
+}
+else
+{
+    <a style="margin-left: 5px;" asp-controller="@Model.Controller" asp-action="Remove" asp-route-id="@Model.Id" class="text-danger"><i class="bi bi-arrow-down-square"></i></a>
+}

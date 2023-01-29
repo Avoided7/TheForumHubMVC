@@ -1,0 +1,75 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Account;
+@using TheForumHubMVC.Data.ViewModels.Question;
+@model IEnumerable<User>
+<style>
+    a {
+        text-decoration: underline;
+    }
+</style>
+<div class="row text-white">
+    @if (ViewData["Search"] as bool? ?? false)
+    {
+        <div class="col-md-12 mb-3">
+            <div class="card bg-dark">
+                <div class="card-body"><h3><b>Founded @Model.Count() users</b></h3></div>
+            </div>
+        </div>
+    }
+
+    @foreach (var user in Model)
+    {
+        <div class="col-md-4 col-xs-6">
+
+            <div class="card bg-dark mb-3">
+                <div class="row g-0">
+                    <div class="col-md-12">
+
+                        <div class="card-header">
+                            <h3><b><a asp-action="Profile" asp-route-id="@user.UserName">@@@user.UserName</a></b></h3>
+                        </div>
+                        <div class="card-body" style="font-size: 24px;">
+                            <img src="@(await Component.InvokeAsync("Photo", user.LogoImg))" style="width: 200px; height: 200px; margin: 0px 14px 14px 0px;" class="float-start" alt="" />
+
+                            @{
+                                int answersRating = user?.Answers?.Sum(a => a?.Ratings?.Sum(r => r.Rating) ?? 0) ?? 0;
+                                int questionsRating = user?.Questions?.Sum(q => q?.Ratings?.Sum(r => r.Rating) ?? 0) ?? 0;
+                                int questionsCount = user?.Questions?.Count() ?? 0;
+                                int answersCount = user?.Answers?.Count() ?? 0;
+                            }
+                            <p>
+                                @if (questionsCount != 0)
+                                {
+                                    <a asp-action="Questions" asp-route-username="@user.UserName"><b>Questions:</b></a>
+                                }
+                                else
+                                {
+                                    <b>Questions:</b>
+                                }
+                                @questionsCount
+                            </p>
+                            <p>
+                                @if (answersCount != 0)
+                                {
+                                    <a asp-action="Answers" asp-route-username="@user.UserName"><b>Answers:</b></a>
+                                }
+                                else
+                                {
+                                    <b>Answers:</b>
+                                }
+                                @answersCount
+                            </p>
+                            <p><b>Rating: </b>@((answersRating + questionsRating > 0 ? "+" : "") + (answersRating + questionsRating))</p>
+                        </div>
+                        <div class="card-footer" style="clear:both;">
+                            <p><b>Date of registration: </b>@user.RegistrationDate.ToString("dd.MM.yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    <div class="col-md-12 mb-3">
+        @await Html.PartialAsync("_SearchUserPaggination", ViewBag.UserPaggination as SearchUserPagginationVM)
+    </div>
+</div>

@@ -1,0 +1,28 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Account;
+@model LoginVM
+@{
+    ViewData["Title"] = "Logining";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form method="post">
+            <div class="card bg-dark text-white mb-3">
+                <div class="card-body">
+                    <div class="card-text">
+                        <label class="form-label" asp-for="Username"></label>
+                        <input class="form-control" asp-for="Username" />
+                        <span class="text-danger" asp-validation-for="Username"></span>
+                    </div>
+                    <div class="card-text">
+                        <label class="form-label" asp-for="Password"></label>
+                        <input class="form-control" asp-for="Password" />
+                        <span class="text-danger" asp-validation-for="Password"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

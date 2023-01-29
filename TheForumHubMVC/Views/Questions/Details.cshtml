@@ -1,0 +1,160 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model Question
+@{
+    ViewData["Title"] = Model.Title;
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card text-white mb-2">
+            <div class="card-header">
+                <h1><b>@Model.Title</b></h1>
+
+                <b>Asked: </b>@Model.Asked.ToString("dd MMMM yyyy")
+                @if (@Model.Modified != null)
+                {
+                    @: |
+                    <b>Modified: </b>
+
+                    @Convert.ToDateTime(Model.Modified).ToString("dd MMMM yyyy")
+                }
+
+                <br />
+                <span style="font-size: 18px;">
+                    @{
+                        var rating = Model.Ratings?.Sum(r => r.Rating) ?? 0;
+                        var user = Model.User;
+                        var userRating = user.QuestionRatings?.FirstOrDefault(r => r.QuestionId == Model.Id)?.Rating;
+                        var ratingVM = new RatingToQuestionVM()
+            {
+                Controller = "Questions",
+                Rating = userRating ?? 0,
+                TotalRating = rating,
+                Id = Model.Id
+            };
+                    }
+                    @(await Component.InvokeAsync("Rating", ratingVM))
+
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="card-text">
+                    @Model.Description
+                </div>
+            </div>
+            <div class="card-footer">
+                @foreach (var tag in Model.Question_Tags)
+                {
+                    <a asp-action="Filter" asp-route-tag="@tag.Tag.Name"><span class="badge rounded-pill bg-warning align-middle" style="min-width: 30px; margin-left: 5px;">@tag.Tag.Name</span></a>
+                }
+                <span class="float-end align-middle">
+                    <span style="font-style:italic;">@Model.Views views</span>
+                    @if (Model.User.UserName == User.Identity.Name)
+                    {
+
+                        <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i></a>
+                        <a class="text-danger" asp-action="Delete" asp-route-id="@Model.Id"><i class="bi bi-trash"></i></a>
+
+                    }
+                    @if (await _userManager.IsInRoleAsync(Model.User, Roles.Admin))
+                    {
+                        @await Html.PartialAsync("_IsAdmin", Model.User)
+
+
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Profile" asp-route-id="@Model.User.UserName" style="margin-left: 5px;"><b>@@@Model.User.UserName</b></a>
+
+                    }
+                </span>
+
+            </div>
+        </div>
+        @if (Model.Answers.Any())
+        {
+            <div class="card text-white mb-2">
+                <div class="card-header">
+                    <b>[@Model.Answers.Count()] Comments:</b>
+                </div>
+                <div class="card-body">
+                    @foreach (var answer in Model.Answers)
+                    {
+                        <div class="card bg-dark mb-3">
+                            <div class="card-header" style="font-size: 20px;">
+                                @if (await _userManager.IsInRoleAsync(answer.User, Roles.Admin))
+                                {
+                                    @await Html.PartialAsync("_IsAdmin", Model.User)
+
+
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Profile" asp-route-id="@answer.User.UserName">
+                                        <img src="@(await Component.InvokeAsync("Photo", answer.User.LogoImg))" alt="" class="rounded-circle" style="margin: 0px 5px 0px 5px; max-width: 25px;"></img>
+                                        @@@answer.User.UserName
+                                    </a>
+                                }
+
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text">
+                                    <p>@answer.Content</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="align-middle" style="font-size: 18px;">
+                                        @{
+                                            int answerRating = answer.Ratings?.FirstOrDefault(r => r.UserId == _userManager.GetUserId(User))?.Rating ?? 0;
+                                            int totalRating = answer.Ratings?.Sum(r => r.Rating) ?? 0;
+                                        }
+                                        @if (answerRating == 1)
+                                        {
+                                            <a asp-controller="Answer" asp-action="Add" asp-route-id="@answer.Id" class="text-success"><i class="bi bi-arrow-up-circle-fill"></i></a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Answer" asp-action="Add" asp-route-id="@answer.Id" class="text-success"><i class="bi bi-arrow-up-circle"></i></a>
+                                        }
+                                        <span style="margin: 0px 5px 0px 5px;">@(totalRating > 0 ? "+" + totalRating : totalRating)</span>
+                                        @if (answerRating == -1)
+                                        {
+                                            <a asp-controller="Answer" asp-action="Remove" asp-route-id="@answer.Id" class="text-danger"><i class="bi bi-arrow-down-circle-fill"></i></a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Answer" asp-action="Remove" asp-route-id="@answer.Id" class="text-danger"><i class="bi bi-arrow-down-circle"></i></a>
+                                        }
+
+                                    </span>
+                                    <span class="float-end">
+                                        @if (answer.UserId == _userManager.GetUserId(User))
+                                        {
+                                            <a class="text-warning" asp-controller="Answer" asp-action="Edit" asp-route-id="@answer.Id"><i class="bi bi-pencil"></i></a>
+                                            <a class="text-danger" asp-controller="Answer" asp-action="Delete" asp-route-id="@answer.Id"><i class="bi bi-trash"></i></a>
+                                        }
+                                        @if (answer.Modified != null)
+                                        {
+                                            <span>Modified | </span>
+                                        }
+                                        @answer.SendedAt.ToString("MMM dd, yyyy")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <form method="post" asp-action="Answer" asp-route-id="@Model.Id">
+            <div class="card text-white">
+                <div class="card-body">
+                    <label class="form-label" for="answer"><h4>Your answer</h4></label>
+                    <textarea class="form-control" id="answer" name="answer"></textarea>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success" type="submit">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

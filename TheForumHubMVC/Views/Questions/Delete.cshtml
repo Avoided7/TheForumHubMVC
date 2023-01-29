@@ -1,0 +1,29 @@
+﻿@model Question
+@{
+    ViewData["Title"] = "Delete";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form method="post" asp-route-id="@Model.Id">
+            <div class="card text-white">
+                <div class="card-header">
+                    <h2><b>Delete?</b></h2>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <label class="form-label" asp-for="Title"></label>
+                        <h3>@Model.Title</h3>
+                    </div>
+                    <hr />
+                    <div class="card-text">
+                        <label class="form-label" asp-for="Description"></label>
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

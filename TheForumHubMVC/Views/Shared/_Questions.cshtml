@@ -1,0 +1,56 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model IEnumerable<Question>
+@foreach (var question in Model)
+{
+    <div class="card bg-dark text-white mb-2">
+        <div class="card-header">
+            <h2><a asp-controller="Questions" asp-action="Details" asp-route-id="@question.Id" style="font-size: 24px; font-weight: 700; text-decoration: none">@question.Title</a></h2>
+            <span style="font-size: 20px;">
+                @{
+                    var rating = question.Ratings?.Sum(r => r.Rating) ?? 0;
+                    var user = await _userManager.GetUserAsync(User);
+                    var userRating = user?.QuestionRatings?.FirstOrDefault(r => r.QuestionId == question.Id)?.Rating;
+                    var ratingVM = new RatingToQuestionVM()
+                {
+                    Controller = "Questions",
+                    Rating = userRating ?? 0,
+                    TotalRating = rating,
+                    Id = question.Id
+                };
+                }
+                @(await Component.InvokeAsync("Rating", ratingVM))
+                <span class="align-middle" style="font-size:14px;">
+                    @(question.Ratings?.Count() ?? 0) votes,
+                    @(question.Answers?.Count() ?? 0) answers,
+                    @question.Views views
+                </span>
+
+
+            </span>
+            <div class="card-title"><b>Asked: </b>@question.Asked.ToString("dd MMMM yyyy")</div>
+        </div>
+        <div class="card-body">
+
+            <div class="card-text">
+                <p>@(String.Join("", question.Description.Take(230)) + (question.Description.Length > 230 ? "..." : ""))</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            @foreach (var tag in question.Question_Tags)
+            {
+                <a asp-controller="Questions" asp-action="Filter" asp-route-tag="@tag.Tag.Name"><span class="badge rounded-pill bg-warning align-middle" style="min-width: 30px; margin-left: 5px;">@tag.Tag.Name</span></a>
+
+            }
+            <span class="float-end align-middle">
+                @if (await _userManager.IsInRoleAsync(question.User, Roles.Admin))
+                {
+                    @await Html.PartialAsync("_IsAdmin", question.User)
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Profile" asp-route-id="@question.User.UserName"><img src="@(await Component.InvokeAsync("Photo", question.User.LogoImg))" alt="" class="rounded-circle" style="margin: 0px 5px 0px 5px; width: 25px; height: 25px;"></img>@@@question.User.UserName</a>
+                }
+            </span>
+        </div>
+    </div>
+}

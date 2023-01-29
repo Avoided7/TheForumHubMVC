@@ -1,0 +1,89 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Account;
+@using TheForumHubMVC.Data;
+@inject ForumDbContext context
+@model ProfileVM
+@{
+    ViewData["Title"] = "Profile";
+    if (ViewData["ReturnUrl"] == null)
+    {
+        ViewData["ReturnUrl"] = Url.Action(action: "All", controller: "Questions");
+    }
+}
+<style>
+    a {
+        text-decoration: underline;
+    }
+</style>
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card text-white">
+            <div class="card-header">
+                <h2><b>@@@Model.Username</b></h2>
+            </div>
+            <div class="card-body">
+                <div class="card-img">
+                    <img class="float-start" src="@ViewData["Photo"]" style="width: 200px; height: 200px; margin-right:14px; margin-bottom: 14px;" alt="" />
+                </div>
+                <div class="text" style="font-size: 24px;">
+                    @{
+                        int answersRating = Model?.Answers.Sum(a => a?.Ratings?.Sum(r => r.Rating) ?? 0) ?? 0;
+                        int questionsRating = Model?.Questions.Sum(q => q?.Ratings?.Sum(r => r.Rating) ?? 0) ?? 0;
+                        int questionsCount = Model.Questions.Count();
+                        int answersCount = Model.Answers.Count();
+                    }
+
+                    <p><b>Email: </b> @Model.Email</p>
+                    <p>
+                        @if (questionsCount != 0)
+                        {
+                            <a asp-action="Questions" asp-route-username="@Model.Username"><b>Questions:</b></a>
+                        }
+                        else
+                        {
+                            <b>Questions:</b>
+                        }
+                        @questionsCount
+                        |
+                        @if (answersCount != 0)
+                        {
+                            <a asp-action="Answers" asp-route-username="@Model.Username"><b>Answers:</b></a>
+                        }
+                        else
+                        {
+                            <b>Answers:</b>
+                        }
+                        @answersCount
+                    </p>
+                    <p><b>Rating: </b>@(answersRating + questionsRating)</p>
+                    @if(Model.Id == _userManager.GetUserId(User))
+                    {
+                        <b>Notifications:</b>
+                        if (Model.Notification)
+                        {
+                            <i class="bi bi-check-lg text-success"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-lg text-danger"></i>
+                        }
+                        
+                    }
+                </div>
+                <div class="text" style="clear: left;">
+                </div>
+            </div>
+            <div class="card-footer">
+                <p class="float-start"><b>Date of registration: </b> @Model.RegistrationDate.ToString("MMM dd, yyyy")</p>
+                @if (User.Identity.IsAuthenticated && User.Identity.Name == Model.Username)
+                {
+                    <div class="float-end">
+                        <a class="btn btn-danger" asp-action="Delete">Delete</a>
+                        <a class="btn btn-warning" asp-action="Edit">Edit</a>
+                        <a class="btn btn-warning" asp-action="ChangePassword">Change password</a>
+                        <a class="btn btn-warning" asp-action="ChangeEmail">Change email</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

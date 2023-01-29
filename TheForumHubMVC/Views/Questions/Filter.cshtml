@@ -1,0 +1,50 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model FilterVM
+@{
+    ViewData["Title"] = Model.Tag.Name;
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card mb-2 text-white bg-dark">
+            <div class="card-header">
+                <h3><b>@Model.Tag.Name</b></h3>
+            </div>
+            <div class="card-body">
+                <div class="card-text">
+                    <p>@Model.Tag.Description</p>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-text">
+                    <p style="font-style: italic;">@Model.Questions.Count() questions, @Model.Questions.Sum(q => q.Answers.Count()) answers</p>
+                </div>
+            </div>
+        </div>
+        <div class="float-start" style="margin: 0px 5px 5px 5px;">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sort by</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" asp-action="Filter" asp-route-tag="@Model.Tag.Name" asp-route-categorie="Rating">Rating</a>
+                        <a class="dropdown-item" asp-action="Filter" asp-route-tag="@Model.Tag.Name" asp-route-categorie="Date">Date</a>
+                        <a class="dropdown-item" asp-action="Filter" asp-route-tag="@Model.Tag.Name" asp-route-categorie="Views">Views</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">
+                        <b>@Model.Categorie</b>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="float-end" style="margin: 0px 5px 5px 5px;">
+            <a class="btn btn-primary" asp-action="CreateTag">Create Tag</a>
+            <a class="btn btn-primary" asp-action="Create">Ask question</a>
+        </div>
+        <div style="clear:both;">
+            @(await Html.PartialAsync("_Questions", Model.Questions))
+        </div>
+        @await Html.PartialAsync("_FilterPaggination", ViewBag.Paggination as PagginationVM)
+    </div>
+
+</div>

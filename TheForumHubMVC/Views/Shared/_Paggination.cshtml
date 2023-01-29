@@ -1,0 +1,66 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Account;
+@using TheForumHubMVC.Data.ViewModels.Question;
+@model PagginationVM
+@{
+    int beginPage = Math.Max(Model.Page - 2, 1);
+    int endPage = Math.Min(Model.Page + 2, Model.TotalPages);
+    int currentPage = Model.Page;
+}
+<div class="float-start">
+    <ul class="nav nav-pills">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Page size</a>
+            <div class="dropdown-menu" style="">
+                <a class="dropdown-item" asp-action="@Model.Action" asp-route-pagesize="10">10</a>
+                <a class="dropdown-item" asp-action="@Model.Action" asp-route-pagesize="25">25</a>
+                <a class="dropdown-item" asp-action="@Model.Action" asp-route-pagesize="50">50</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled">
+                @Model.PageSize
+            </a>
+        </li>
+            
+    </ul>
+</div>
+<div class="float-end">
+    
+    <ul class="pagination">
+        @if (currentPage > 3)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="@Model.Action" asp-route-page="1" asp-route-pagesize="@Model.PageSize">
+                    Begin
+                </a>
+            </li>
+        }
+        @for (int page = beginPage; page <= endPage; page++)
+        {
+            @if (page == currentPage)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link text-white" asp-action="@Model.Action" asp-route-page="@(page)" asp-route-pagesize="@Model.PageSize">
+                        @(page)
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="@Model.Action" asp-route-page="@(page)" asp-route-pagesize="@Model.PageSize">
+                        @(page)
+                    </a>
+                </li>
+            }
+        }
+        @if (currentPage < (Model.TotalPages - 3))
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="@Model.Action" asp-route-page="@Model.TotalPages" asp-route-pagesize="@Model.PageSize">
+                    End
+                </a>
+            </li>
+        }
+    </ul>
+</div>

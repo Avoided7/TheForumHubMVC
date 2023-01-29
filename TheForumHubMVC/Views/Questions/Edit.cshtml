@@ -1,0 +1,36 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model QuestionVM
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form asp-route-id="@(ViewData["id"] as int?)" method="post">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-header">
+                </div>
+                <div class="card-body">
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="Title"></label>
+                        <input class="form-control" asp-for="Title" />
+                        <span class="text-danger" asp-validation-for="Title"></span>
+                    </div>
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="Description"></label>
+                        <textarea class="form-control" asp-for="Description"></textarea>
+                        <span class="text-danger" asp-validation-for="Description"></span>
+                    </div>
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="TagsId"></label>
+                        <select class="form-control" asp-for="TagsId" asp-items="@(ViewData["Tags"] as SelectList)"></select>
+                        <span class="text-danger" asp-validation-for="TagsId"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success float-end">Edit</button>
+                </div>
+                <div asp-validation-summary="ModelOnly"></div>
+            </div>
+        </form>
+    </div>
+</div>

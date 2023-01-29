@@ -1,0 +1,25 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model AnswerVM
+@{
+    ViewData["Title"] = "Edit answer";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form method="post">
+            <div class="card">
+                <div class="card-body">
+                    <input asp-for="UserId" hidden />
+                    <input asp-for="QuestionId" hidden />
+                    <div class="card-text">
+                        <label class="form-label" asp-for="@Model.Content"></label>
+                        <textarea class="form-control" asp-for="@Model.Content"></textarea>
+                        <span class="text-danger" asp-validation-for="@Model.Content"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success" type="submit">Edit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

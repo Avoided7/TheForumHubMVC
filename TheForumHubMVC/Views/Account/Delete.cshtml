@@ -1,0 +1,34 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Account;
+@model DeleteVM
+@{
+    ViewData["Title"] = "Confirm delete.";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form method="post">
+            <div class="card text-white">
+                <div class="card-header">
+                    <h3><b>Delete?</b></h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="UserName"></label>
+                        <input class="form-control" asp-for="UserName" disabled />
+                    </div>
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="Email"></label>
+                        <input class="form-control" asp-for="Email" disabled />
+                    </div>
+                    <div class="card-text mb-3">
+                        <label class="form-label" asp-for="ConfirmPassword"></label>
+                        <input class="form-control" asp-for="ConfirmPassword" />
+                        <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

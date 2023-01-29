@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Question>
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card mb-3 bg-dark text-white">
+            <div class="card-header">
+                <h3><b>@(ViewData["Title"] ?? "User")</b></h3>
+            </div>
+        </div>
+        @(await Html.PartialAsync("_Questions", Model))
+    </div>
+</div>

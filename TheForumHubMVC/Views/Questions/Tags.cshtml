@@ -1,0 +1,52 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Question;
+@model IEnumerable<Tag>
+@{
+    ViewData["Title"] = "Tags";
+    var paggination = ViewBag.TagsPaggination as TagsPagginationVM;
+}
+
+<div class="row">
+    <div class="col-md-6 offset-3">
+        <div class="card bg-dark text-white mb-3">
+            @if (ViewData["Search"] as string != null)
+            {
+                <div class="card-header">
+                    <h3><b>Search "@ViewData["Search"]"</b></h3>
+                </div>
+                <div class="card-body">
+                    <p>@Model.Count() tags</p>
+                </div>
+            }
+            else
+            {
+                <div class="card-header">
+                    <h3><b>Tags</b></h3>
+                </div>
+                <div class="card-body">
+                    <p>A tag is a keyword or label that categorizes your question with other, similar questions. Using the right tags makes it easier for others to find and answer your question.</p>
+                </div>
+            }
+            <div class="card-footer">
+                <form method="get" asp-route-page="@(paggination?.Page ?? 1)" asp-route-page-size="@(paggination?.PageSize ?? 10)">
+                    <input class="form-control" type="search" name="search" style="width: 80%; float: left;" placeholder="Search tag..." />
+                    <button class="btn btn-info" type="submit" style="float: right;">Search</button>
+                </form>
+            </div>
+        </div>
+        @foreach (var tag in Model)
+        {
+            <div class="card bg-dark text-white mb-2">
+                <div class="card-header">
+                    <h3><a class="badge bg-primary" asp-action="Filter" asp-route-tag="@tag.Name">@tag.Name</a></h3>
+                </div>
+                <div class="card-body">
+                    <p>@(tag.Description.Length > 100 ? string.Join("", tag.Description.Take(160)) + "..." : tag.Description)</p>
+                </div>
+                <div class="card-footer">
+                    <p><b>@(tag.Tag_Questions?.Count() ?? 0) questions, @(tag?.Tag_Questions?.Sum(q => q.Question.Answers?.Count() ?? 0) ?? 0) answers</b></p>
+                </div>
+            </div>
+        }
+        @(await Html.PartialAsync("_TagsPaggination", paggination))
+    </div>
+</div>

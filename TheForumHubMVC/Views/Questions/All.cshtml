@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using TheForumHubMVC.Data.ViewModels.Question;
+@using TheForumHubMVC.Data;
+@inject ForumDbContext context
+
+@model IEnumerable<Question>
+@{
+    ViewData["Title"] = "Questions";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card text-white bg-dark mb-2">
+            <div class="card-header">
+                <h2><b>All questions</b></h2>
+            </div>
+            <div class="card-footer">
+                <p style="font-style: italic;">@Model.Count() questions, @Model.Sum(q => q.Answers.Count()) answers, @Model.Sum(q => q.Views) views</p>
+            </div>
+        </div>
+        <div class="float-start" style="margin: 0px 5px 5px 5px;">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Sort by</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" asp-action="All" asp-route-categorie="Rating">Rating</a>
+                        <a class="dropdown-item" asp-action="All" asp-route-categorie="Date">Date</a>
+                        <a class="dropdown-item" asp-action="All" asp-route-categorie="Views">Views</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">
+                        <b>@ViewBag.Categorie</b>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        @await Html.PartialAsync("_CreateButtons")
+        <div style="clear:both;">
+            @(await Html.PartialAsync("_Questions", Model))
+        </div>
+        @(await Html.PartialAsync("_Paggination", ViewBag.Paggination as PagginationVM))
+    </div>
+</div>
