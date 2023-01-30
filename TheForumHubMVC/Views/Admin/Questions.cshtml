@@ -34,14 +34,14 @@
                     @{
                         var user = report.Question.User;
                     }
-                    <a class="btn btn-danger float-start" asp-action="Delete" asp-route-id="@report.Question.Id">Delete</a>
+                    <a class="btn btn-danger float-end" asp-controller="Questions" asp-action="Delete" asp-route-id="@report.Question.Id">Delete</a>
                     @if (await _userManager.IsInRoleAsync(user, Roles.Admin))
                     {
-                        <div class="float-end">@await Html.PartialAsync("_IsAdmin", user)</div>
+                        <div class="float-start">@await Html.PartialAsync("_IsAdmin", user)</div>
                     }
                     else
                     {
-                        <a class="float-end" asp-controller="Account" asp-action="Profile" asp-route-id="@user.UserName">@@@user.UserName</a>
+                        <a class="float-start" asp-controller="Account" asp-action="Profile" asp-route-id="@user.UserName">@@@user.UserName</a>
                         
                     }
                 </div>

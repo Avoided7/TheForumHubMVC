@@ -21,19 +21,22 @@ namespace TheForumHubMVC.Controllers
         private readonly IQuestionService _questionManager;
         private readonly ITagService _tagManager;
         private readonly IMapper _mapper;
+        private readonly IAdminService _adminManager;
         private readonly UserManager<User> _userManager;
 
         public QuestionsController(ILogger<QuestionsController> logger,
                               IQuestionService questionManager,
                               ITagService tagManager,
                               IMapper mapper,
-                              UserManager<User> userManager)
+                              UserManager<User> userManager,
+                              IAdminService adminManager)
         {
             _logger = logger;
             _questionManager = questionManager;
             _tagManager = tagManager;
             _mapper = mapper;
             _userManager = userManager;
+            _adminManager = adminManager;
         }
         #region Edit
         [HttpGet]
@@ -41,7 +44,7 @@ namespace TheForumHubMVC.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var question = await _questionManager.GetQuestionByIdAsync(id);
-            if (question == null || question.User.UserName != User.Identity.Name)
+            if (question == null || (question.User.UserName != User.Identity.Name && !User.IsInRole(Roles.Admin)))
             {
                 return NotFound();
             }
@@ -53,7 +56,7 @@ namespace TheForumHubMVC.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int id, QuestionVM model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
                 return View(model);
@@ -66,13 +69,13 @@ namespace TheForumHubMVC.Controllers
             }
             var question = (await _questionManager.GetQuestionByIdAsync(id));
             var userId = _userManager.GetUserId(User);
-            if (question == null || question.UserId != userId)
+            if (question == null || (question.UserId != userId && !User.IsInRole(Roles.Admin)))
             {
                 ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
                 ModelState.AddModelError("", "Error");
                 return View(model);
             }
-            model.UserId = userId;
+            model.UserId = question.UserId;
             await _questionManager.UpdateQuestionAsync(id, model);
             return RedirectToAction(nameof(Details), new { id = id });
         }
@@ -248,15 +251,16 @@ namespace TheForumHubMVC.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _questionManager.GetQuestionByIdAsync(id);
-            if (question == null || question.UserId != _userManager.GetUserId(User)) { return NotFound(); }
+            if (question == null || (question.UserId != _userManager.GetUserId(User) && !User.IsInRole(Roles.Admin))) { return NotFound(); }
             return View(question);
         }
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirm(int id)
         {
             var question = await _questionManager.GetQuestionByIdAsync(id);
-            if (question == null || question.UserId != _userManager.GetUserId(User)) { return NotFound(); }
+            if (question == null || (question.UserId != _userManager.GetUserId(User) && !User.IsInRole(Roles.Admin))) { return NotFound(); }
             await _questionManager.DeleteQuestionAsync(id);
+            await _adminManager.RemoveReportsAsync(question.Id, Data.Enums.ReportType.QuestionType);
             return RedirectToAction(nameof(All));
         }
         #endregion
@@ -289,11 +293,11 @@ namespace TheForumHubMVC.Controllers
                 Search = search
             };
             if (search != null) search = search.Trim();
-            if (string.IsNullOrWhiteSpace(search)) 
+            if (string.IsNullOrWhiteSpace(search))
             {
                 var totalPages = (int)Math.Ceiling(tags.Count() / (double)pageSize);
                 if (page > totalPages) ViewBag.TagsPaggination.Page = totalPages;
-                return View(tags.Skip((page - 1) * pageSize).Take(pageSize)); 
+                return View(tags.Skip((page - 1) * pageSize).Take(pageSize));
             }
 
             ViewData["Search"] = search;
@@ -324,7 +328,7 @@ namespace TheForumHubMVC.Controllers
         public async Task<IActionResult> Filter(string tag, string categorie = "", int page = 1, int pageSize = 10)
         {
             var questions = (await _questionManager.GetQuestionsAsync()).Where(q => q.Question_Tags.FirstOrDefault(qt => qt.Tag.Name == tag) != null);
-            
+
             switch (categorie.ToLower())
             {
                 case "rating":

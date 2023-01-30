@@ -11,5 +11,7 @@ namespace TheForumHubMVC.Data.Services
         Task<List<ReportQuestionVM>> GetQuestionReportsByIdAsync(int id);
         Task<bool> RemoveReportAsync(int id);
         Task RemoveReportsAsync(int id, ReportType type);
+        Task<List<ReportAnswerVM>> GetAnswersReportAsync();
+        Task<IEnumerable<ReportAnswerVM>> GetAnswerReportsByIdAsync(int id);
     }
 }

@@ -62,8 +62,6 @@
                     @if (await _userManager.IsInRoleAsync(Model.User, Roles.Admin))
                     {
                         @await Html.PartialAsync("_IsAdmin", Model.User)
-
-
                     }
                     else
                     {
@@ -87,9 +85,7 @@
                             <div class="card-header" style="font-size: 20px;">
                                 @if (await _userManager.IsInRoleAsync(answer.User, Roles.Admin))
                                 {
-                                    @await Html.PartialAsync("_IsAdmin", Model.User)
-
-
+                                    @await Html.PartialAsync("_IsAdmin", answer.User)
                                 }
                                 else
                                 {
@@ -98,7 +94,10 @@
                                         @@@answer.User.UserName
                                     </a>
                                 }
-
+                                @if (User.Identity.IsAuthenticated && answer.User.UserName != User.Identity.Name)
+                                {
+                                    <a asp-controller="Answer" asp-action="Report" asp-route-id="@answer.Id"><i class="bi bi-flag text-warning"></i></a>
+                                }
                             </div>
                             <div class="card-body">
                                 <div class="card-text">

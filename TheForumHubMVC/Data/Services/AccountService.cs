@@ -17,9 +17,11 @@ namespace TheForumHubMVC.Data.Services
             var questionRatings = _context.QuestionsRating.Where(qr => qr.UserId == id);
             var questions = _context.Questions.Where(q => q.UserId == id);
             var answers = _context.Answers.Where(a => a.UserId == id);
+            var reports = _context.Reports.Where(r => r.UserId == id);
 
             _context.AnswersRating.RemoveRange(answerRatings);
             _context.QuestionsRating.RemoveRange(questionRatings);
+            _context.Reports.RemoveRange(reports);
 
             foreach(var question in questions)
             {

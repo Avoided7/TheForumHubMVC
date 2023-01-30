@@ -21,9 +21,17 @@ namespace TheForumHubMVC.Controllers
         {
             return View(await _adminManager.GetQuestionReportsByIdAsync(id));
         }
+        public async Task<IActionResult> Info(int id)
+        {
+            return View(await _adminManager.GetAnswerReportsByIdAsync(id));
+        }
         public async Task<IActionResult> Questions()
         {
-            return View((await _adminManager.GetQuestionsReportAsync()));
+            return View(await _adminManager.GetQuestionsReportAsync());
+        }
+        public async Task<IActionResult> Answers()
+        {
+            return View(await _adminManager.GetAnswersReportAsync());
         }
         [HttpGet]
         public async Task<IActionResult> Remove(int id)
@@ -39,15 +47,10 @@ namespace TheForumHubMVC.Controllers
             return RedirectToAction(nameof(Questions));
         }
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> RemoveAnswer(int id)
         {
-            return View(await _questionManager.GetQuestionByIdAsync(id));
-        }
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _adminManager.DeleteAsync(id, Data.Enums.ReportType.QuestionType);
-            return RedirectToAction(nameof(Questions));
+            await _adminManager.RemoveReportsAsync(id, Data.Enums.ReportType.AnswerType);
+            return RedirectToAction(nameof(Answers));
         }
     }
 }

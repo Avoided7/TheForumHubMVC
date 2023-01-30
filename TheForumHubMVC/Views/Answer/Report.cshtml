@@ -1,0 +1,28 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Admin;
+@model ReportVM
+@{
+    ViewData["Title"] = "Report";
+}
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <form method="post" asp-route-id="@ViewBag.Id">
+            <div class="card">
+                <div class="card-header">
+                    <h3><b>Report</b></h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <label class="form-label" asp-for="Content"></label>
+                        <input class="form-control" asp-for="Content" />
+                        <span class="text-danger" asp-validation-for="Content"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-warning" type="submit">
+                        Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

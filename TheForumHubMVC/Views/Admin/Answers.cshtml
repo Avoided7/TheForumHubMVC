@@ -1,0 +1,38 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Admin;
+@model IEnumerable<ReportAnswerVM>
+@{
+    ViewData["Title"] = "Answer reports";
+}
+<div class="row">
+    <div class="col-md-8 offset-2 text-white">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><b>Answers reports</b></h3>
+            </div>
+            <div class="card-footer">
+                <p style="font-style:italic;">@Model.Sum(q => q.ReportCount) reports</p>
+            </div>
+        </div>
+        @foreach (var answer in Model)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <div style="width: 90%; float:left;">
+                        <h4><a asp-controller="Account" asp-action="Details" asp-route-id="@answer.User.UserName">@@@answer.User.UserName</a></h4>
+                        <p><b>Reports: </b>@answer.ReportCount</p>
+                    </div>
+                    <a asp-action="RemoveAnswer" asp-route-id="@answer.Answer.Id"><i class="bi bi-x-lg text-danger" style="float: right"></i></a>
+
+                </div>
+                <div class="card-body">
+                    <p>@answer.ReportContent</p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-danger float-end" asp-controller="Questions" asp-action="Delete" asp-route-id="@answer.Answer.Id">Delete</a>
+
+                    <a class="btn btn-info" asp-action="Info" asp-route-id="@answer.Answer.Id">Info</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TheForumHubMVC.Data.Enums;
 using TheForumHubMVC.Data.ViewModels.Admin;
+using TheForumHubMVC.Data.ViewModels.Question;
 using TheForumHubMVC.Models;
 
 namespace TheForumHubMVC.Data.Services
@@ -22,6 +23,42 @@ namespace TheForumHubMVC.Data.Services
             _userManager = userManager;
             _questionManager = questionManager;
             _answerManager = answerManager;
+        }
+        public async Task<List<ReportAnswerVM>> GetAnswersReportAsync()
+        {
+            var reportsAnswer = _context.Reports.Where(r => r.ReportType == ReportType.AnswerType).ToList();
+            var reportsVM = new List<ReportAnswerVM>();
+            foreach (var report in reportsAnswer.DistinctBy(r => r.TypeId))
+            {
+                var answer = await _context.Answers.Include(a => a.User).FirstOrDefaultAsync(a => a.Id == report.TypeId);
+                reportsVM.Add(new ReportAnswerVM()
+                {
+                    Id = report.Id,
+                    Answer = answer,
+                    ReportCount = _context.Reports.Count(r => r.ReportType == ReportType.AnswerType && r.TypeId == answer.Id),
+                    ReportContent = report.Content,
+                    User = answer.User
+                });
+            }
+            return reportsVM;
+        }
+        public async Task<IEnumerable<ReportAnswerVM>> GetAnswerReportsByIdAsync(int id)
+        {
+            var reportsAnswer = _context.Reports.Where(r => r.ReportType == ReportType.AnswerType && r.TypeId == id);
+            var reportsVM = new List<ReportAnswerVM>();
+            foreach (var report in reportsAnswer)
+            {
+                var answer = await _context.Answers.Include(a => a.User).FirstOrDefaultAsync(a => a.Id == report.TypeId);
+                reportsVM.Add(new ReportAnswerVM()
+                {
+                    Id = report.Id,
+                    Answer = answer,
+                    ReportCount = _context.Reports.Count(r => r.ReportType == ReportType.AnswerType && r.TypeId == answer.Id),
+                    ReportContent = report.Content,
+                    User = await _userManager.FindByIdAsync(report.UserId)
+                });
+            }
+            return reportsVM;
         }
         public async Task<List<ReportQuestionVM>> GetQuestionReportsByIdAsync(int id)
         {
@@ -46,7 +83,7 @@ namespace TheForumHubMVC.Data.Services
         {
             var reports = _context.Reports.Where(r => r.ReportType == Enums.ReportType.QuestionType).ToList();
             var reportsVM = new List<ReportQuestionVM>();
-            foreach(var report in reports.DistinctBy(r => r.TypeId))
+            foreach (var report in reports.DistinctBy(r => r.TypeId))
             {
                 var question = await _context.Questions.Include(q => q.User).FirstOrDefaultAsync(q => q.Id == report.TypeId);
                 var user = await _userManager.FindByIdAsync(report.UserId);
@@ -80,7 +117,7 @@ namespace TheForumHubMVC.Data.Services
         {
             var reports = _context.Reports.Where(r => r.TypeId == id && r.ReportType == type);
             _context.Reports.RemoveRange(reports);
-            switch(type)
+            switch (type)
             {
                 case ReportType.QuestionType:
                     await _questionManager.DeleteQuestionAsync(id);
@@ -91,7 +128,7 @@ namespace TheForumHubMVC.Data.Services
                 default:
                     break;
             }
-            
+
         }
     }
 }

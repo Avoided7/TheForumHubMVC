@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TheForumHubMVC.Data.ViewModels.Admin;
 using TheForumHubMVC.Data.ViewModels.Answer;
 using TheForumHubMVC.Data.ViewModels.Question;
 using TheForumHubMVC.Models;
@@ -69,6 +70,18 @@ namespace TheForumHubMVC.Data.Services
             _context.Answers.Remove(answer);
             _context.AnswersRating.RemoveRange(answersRating);
             
+            await _context.SaveChangesAsync();
+        }
+        public async Task ReportAsync(ReportVM model)
+        {
+            var report = new Report()
+            {
+                ReportType = Enums.ReportType.AnswerType,
+                TypeId = model.TypeId,
+                Content = model.Content,
+                UserId = model.UserId
+            };
+            _context.Reports.Add(report);
             await _context.SaveChangesAsync();
         }
     }
