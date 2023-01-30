@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TheForumHubMVC.Data.Helpers;
 using TheForumHubMVC.Data.ViewModels;
+using TheForumHubMVC.Data.ViewModels.Admin;
 using TheForumHubMVC.Data.ViewModels.Answer;
 using TheForumHubMVC.Data.ViewModels.Question;
 using TheForumHubMVC.Models;
@@ -18,7 +19,20 @@ namespace TheForumHubMVC.Data.Services
             _context = context;
             _mailManager = mailManager;
         }
-
+        public async Task Report(ReportVM model)
+        {
+            var question = await GetQuestionByIdAsync(model.TypeId);
+            if (question == null || question.UserId == model.UserId) { return; }
+            var report = new Report()
+            {
+                Content = model.Content,
+                UserId = model.UserId,
+                ReportType = Enums.ReportType.QuestionType,
+                TypeId = model.TypeId
+            };
+            await _context.Reports.AddAsync(report);
+            await _context.SaveChangesAsync();
+        }
         public async Task AddViewsAsync(ViewsVM model)
         {
             var question = await _context.Questions.FirstOrDefaultAsync(q => q.Id == model.QuestionId);
@@ -159,6 +173,7 @@ namespace TheForumHubMVC.Data.Services
             return await _context.Questions
                                  .Include(q => q.User)
                                  .Include(q => q.Answers)
+                                 .ThenInclude(a => a.User)
                                  .Include(q => q.Ratings)
                                  .Include(q => q.Question_Tags)
                                  .ThenInclude(t => t.Tag)

@@ -36,28 +36,15 @@
 
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Questions" asp-action="All">Questions</a>
+                            <a class="nav-link" asp-action="Questions">Questions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Questions" asp-action="Tags">Tags</a>
+                            <a class="nav-link" asp-action="Answers">Answers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Search">Users</a>
+                            <span class="nav-link text-white">Admin panel</span>
                         </li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Admin))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Questions">Admin Panel</a>
-                            </li>
-                        }
                     </ul>
-                    <form class="d-flex" asp-action="Search">
-                        @{
-                            var search = "";
-                        }
-                        <input class="form-control me-sm-2" type="search" asp-for="@search" style="border: 1px solid grey;" placeholder="Search">
-                        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-                    </form>
                     <ul class="navbar-nav d-flex">
                         @if (User.Identity.IsAuthenticated)
                         {

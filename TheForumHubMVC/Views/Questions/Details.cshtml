@@ -2,6 +2,7 @@
 @model Question
 @{
     ViewData["Title"] = Model.Title;
+    var currentUser = await _userManager.GetUserAsync(User);
 }
 <div class="row">
     <div class="col-md-8 offset-2">
@@ -17,7 +18,10 @@
 
                     @Convert.ToDateTime(Model.Modified).ToString("dd MMMM yyyy")
                 }
-
+                @if (User.Identity.IsAuthenticated && Model.User.UserName != User.Identity.Name)
+                {
+                    <a asp-action="Report" asp-route-id="@Model.Id"><i class="bi bi-flag text-warning"></i></a>
+                }
                 <br />
                 <span style="font-size: 18px;">
                     @{
@@ -48,7 +52,7 @@
                 }
                 <span class="float-end align-middle">
                     <span style="font-style:italic;">@Model.Views views</span>
-                    @if (Model.User.UserName == User.Identity.Name)
+                    @if (Model.User.UserName == User.Identity.Name || await _userManager.IsInRoleAsync(currentUser, Roles.Admin))
                     {
 
                         <a class="text-warning" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i></a>
@@ -126,7 +130,7 @@
 
                                     </span>
                                     <span class="float-end">
-                                        @if (answer.UserId == _userManager.GetUserId(User))
+                                        @if (answer.UserId == _userManager.GetUserId(User) || await _userManager.IsInRoleAsync(currentUser, Roles.Admin))
                                         {
                                             <a class="text-warning" asp-controller="Answer" asp-action="Edit" asp-route-id="@answer.Id"><i class="bi bi-pencil"></i></a>
                                             <a class="text-danger" asp-controller="Answer" asp-action="Delete" asp-route-id="@answer.Id"><i class="bi bi-trash"></i></a>

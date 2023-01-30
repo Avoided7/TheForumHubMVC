@@ -1,4 +1,5 @@
 ﻿using TheForumHubMVC.Data.ViewModels;
+using TheForumHubMVC.Data.ViewModels.Admin;
 using TheForumHubMVC.Data.ViewModels.Question;
 using TheForumHubMVC.Models;
 
@@ -15,5 +16,6 @@ namespace TheForumHubMVC.Data.Services
         Task AddRatingAsync(QuestionRatingVM model);
         Task<List<QuestionRating>> GetQuestionsRatingAsync();
         Task AddViewsAsync(ViewsVM model);
+        Task Report(ReportVM model);
     }
 }

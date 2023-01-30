@@ -19,11 +19,15 @@
                     </div>
                     <div class="card-text mb-3">
                         <label class="form-label" asp-for="Description"></label>
+                        <br/>
+                        <span style="font-style: italic;">Minimum length 20 characters.</span>
                         <textarea class="form-control" asp-for="Description"></textarea>
                         <span class="text-danger" asp-validation-for="Description"></span>
                     </div>
                     <div class="card-text mb-3">
                         <label class="form-label" asp-for="TagsId"></label>
+                        <br />
+                        <span style="font-style: italic;">Maximum 5 tags.</span>
                         <select class="form-control" asp-for="TagsId" asp-items="@(ViewData["Tags"] as SelectList)"></select>
                         <span class="text-danger" asp-validation-for="TagsId"></span>
                     </div>

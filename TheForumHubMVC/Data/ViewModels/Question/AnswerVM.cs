@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace TheForumHubMVC.Data.ViewModels.Question
 {
@@ -7,6 +8,7 @@ namespace TheForumHubMVC.Data.ViewModels.Question
     {
         [ValidateNever]
         public int Id { get; set; }
+        [Required]
         public string Content { get; set; }
         public int QuestionId { get; set; }
         public string UserId { get; set; }

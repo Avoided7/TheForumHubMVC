@@ -35,5 +35,6 @@ namespace TheForumHubMVC.Data
         public DbSet<Answer> Answers { get; set; }
         public DbSet<QuestionRating> QuestionsRating { get; set; }
         public DbSet<AnswerRating> AnswersRating { get; set; }
+        public DbSet<Report> Reports { get; set; }
     }
 }

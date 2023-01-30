@@ -47,7 +47,8 @@ namespace TheForumHubMVC.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var answer = await _answerManager.GetAnswerByIdAsync(id);
-            if (answer == null || answer.UserId != _userManager.GetUserId(User))
+            var user = await _userManager.GetUserAsync(User);
+            if (answer == null || (answer.UserId != user.Id && await _userManager.IsInRoleAsync(user, Roles.Admin)))
             {
                 return NotFound();
             }
@@ -63,9 +64,14 @@ namespace TheForumHubMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(AnswerVM model)
         {
-            var userId = _userManager.GetUserId(User);
+            if (!ModelState.IsValid) return View(model);
+            var user = await _userManager.GetUserAsync(User);
             var answer = await _answerManager.GetAnswerByIdAsync(model.Id);
-            if (answer == null || answer.UserId != userId || model.UserId != userId)
+            if (answer != null && await _userManager.IsInRoleAsync(user, Roles.Admin))
+            {
+
+            }
+            else if (answer == null || answer.UserId != user.Id || model.UserId != user.Id)
             {
                 return NotFound();
             }
@@ -80,7 +86,7 @@ namespace TheForumHubMVC.Controllers
         {
             
             var answer = await _answerManager.GetAnswerByIdAsync(id);
-            if (answer == null || answer.UserId != _userManager.GetUserId(User))
+            if (!User.IsInRole(Roles.Admin) && (answer == null || answer.UserId != _userManager.GetUserId(User)))
             {
                 return NotFound();
             }
@@ -98,7 +104,7 @@ namespace TheForumHubMVC.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var answer = await _answerManager.GetAnswerByIdAsync(model.Id);
-            if (userId != model.UserId || answer == null || answer.UserId != userId)
+            if (!User.IsInRole(Roles.Admin) && (userId != model.UserId || answer == null || answer.UserId != userId))
             {
                 ModelState.AddModelError("", "Error");
                 return View(model);

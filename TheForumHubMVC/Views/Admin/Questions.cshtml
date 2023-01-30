@@ -1,0 +1,51 @@
+﻿@using TheForumHubMVC.Data.ViewModels.Admin;
+@model IEnumerable<ReportQuestionVM>
+@{
+    ViewData["Title"] = "Questions";
+}
+<div class="row">
+    <div class="col-md-8 offset-2 text-white">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><b>Question reports</b></h3>
+            </div>
+            <div class="card-footer">
+                <p style="font-style:italic;">@Model.Sum(q => q.ReportCount) reports</p>
+            </div>
+        </div>
+        @foreach (var report in Model)
+        {
+            <div class="card mb-2">
+                <div class="card-header">
+                    <div style="width:90%; float:left;">
+                    <h4><b><a asp-action="Details" asp-route-id="@report.Question.Id">@report.Question.Title</a></b></h4>
+                    <p ><b>Reports: </b>@report.ReportCount</p>
+                    </div>
+                    <a asp-action="RemoveQuestion" asp-route-id="@report.Question.Id"><i class="bi bi-x-lg text-danger" style="float: right"></i></a>
+                </div>
+                <div class="card-body">
+                    @{
+                        var description = @report.Question.Description;
+                        if (description.Length > 230) description = string.Join("", description.Take(230)) + "...";
+                    }
+                    <p>@description</p>
+                </div>
+                <div class="card-footer">
+                    @{
+                        var user = report.Question.User;
+                    }
+                    <a class="btn btn-danger float-start" asp-action="Delete" asp-route-id="@report.Question.Id">Delete</a>
+                    @if (await _userManager.IsInRoleAsync(user, Roles.Admin))
+                    {
+                        <div class="float-end">@await Html.PartialAsync("_IsAdmin", user)</div>
+                    }
+                    else
+                    {
+                        <a class="float-end" asp-controller="Account" asp-action="Profile" asp-route-id="@user.UserName">@@@user.UserName</a>
+                        
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

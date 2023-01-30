@@ -50,6 +50,7 @@ namespace TheForumHubMVC
             builder.Services.AddScoped<ITagService, TagService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
 
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(Program).Assembly);

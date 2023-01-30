@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using TheForumHubMVC.Data.Enums;
 using TheForumHubMVC.Data.Helpers;
 using TheForumHubMVC.Data.Services;
 using TheForumHubMVC.Data.ViewModels;
+using TheForumHubMVC.Data.ViewModels.Admin;
 using TheForumHubMVC.Data.ViewModels.Question;
 using TheForumHubMVC.Models;
 
@@ -106,6 +108,10 @@ namespace TheForumHubMVC.Controllers
         [Authorize]
         public async Task<IActionResult> Answer(int id, string answer)
         {
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                return RedirectToAction(nameof(Details), new { id = id });
+            }
             var user = await _userManager.GetUserAsync(User);
             var answerVM = new AnswerVM()
             {
@@ -189,7 +195,23 @@ namespace TheForumHubMVC.Controllers
                 ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
                 return View(question);
             }
-            if(question.TagsId.Count() > 5)
+            question.Title = question.Title.Trim();
+            question.Description = question.Description.Trim();
+
+            if (question.Title.Length < 5)
+            {
+                ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
+                ModelState.AddModelError("Title", "The Title minimum length is 5 characters.");
+                return View(question);
+            }
+            if (question.Description.Length < 20)
+            {
+                ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
+                ModelState.AddModelError("Description", "The Description minimum length is 20 characters.");
+                return View(question);
+            }
+
+            if (question.TagsId.Count() > 5)
             {
                 ViewData["Tags"] = new SelectList(await _tagManager.GetTagsAsync(), "Id", "Name");
                 ModelState.AddModelError("TagsId", "Maximum tags 5.");
@@ -238,6 +260,21 @@ namespace TheForumHubMVC.Controllers
             return RedirectToAction(nameof(All));
         }
         #endregion
+        [HttpGet, Authorize]
+        public async Task<IActionResult> Report(int id)
+        {
+            ViewBag.Id = id;
+            return View();
+        }
+        [HttpPost, Authorize]
+        public async Task<IActionResult> Report(int id, ReportVM model)
+        {
+            if (!ModelState.IsValid) { ViewBag.Id = id; return View(model); }
+            model.UserId = _userManager.GetUserId(User);
+            model.TypeId = id;
+            await _questionManager.Report(model);
+            return RedirectToAction(nameof(Details), new { id = id });
+        }
         [HttpGet]
         public async Task<IActionResult> Tags(string search, int page = 1, int pageSize = 10)
         {
